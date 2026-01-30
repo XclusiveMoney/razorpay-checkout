@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { createShopifyOrder, getVariantInfo } from "../controllers/shopify.js";
 import { sendPurchaseCommunication } from "../controllers/intrakat.js";
+import InvoiceModel from "../../utils/models/InvoiceModel.js";
 
 const razorpayRoutes = Router();
 
@@ -8,11 +9,16 @@ razorpayRoutes.post("/", async (req, res) => {
   try {
     const body = req.body;
     const shop = process.env.STORE_HANDLE;
+    const isInvoiceAlreadyProcessed = await InvoiceModel.findOne({id: body.payload?.payment?.entity?.id });
     console.log({
       message: "webhook was triggered",
       data: body,
     });
-    if (body?.event == "invoice.paid") {
+    const invoice = new InvoiceModel({
+      id: body.payload?.payment?.entity?.id 
+    });
+    await invoice.save();
+    if (body?.event == "invoice.paid" && !isInvoiceAlreadyProcessed){
       const structuredPayload = {
         variantId: body.payload?.payment?.entity?.notes?.variantId || null,
         customer: {
