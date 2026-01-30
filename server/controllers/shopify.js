@@ -151,8 +151,8 @@ const createShopifyOrder = async (shop, variantData, customerDetails) => {
           phone: customerDetails.phone,
         },
       };
-    };
-    console.log(variables)
+    }
+    console.log(variables);
     const { data, errors, extensions } = await client.request(query, {
       variables,
     });

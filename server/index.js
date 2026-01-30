@@ -42,6 +42,7 @@ const createServer = async (root = process.cwd()) => {
   const app = Express();
   app.disable("x-powered-by");
 
+  app.use("/health",(req,res) => res.status(200).json({ok: true}))
   // Incoming webhook requests
   app.post(
     "/api/webhooks/*webhookTopic",
