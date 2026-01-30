@@ -10,14 +10,11 @@ razorpayRoutes.post("/", async (req, res) => {
     const body = req.body;
     const shop = process.env.STORE_HANDLE;
     const isInvoiceAlreadyProcessed = await InvoiceModel.findOne({id: body.payload?.payment?.entity?.id });
-    console.log({
-      message: "webhook was triggered",
-      data: body,
-    });
     const invoice = new InvoiceModel({
       id: body.payload?.payment?.entity?.id 
     });
     await invoice.save();
+    console.log("look if it existed or not --->", isInvoiceAlreadyProcessed);
     if (body?.event == "invoice.paid" && !isInvoiceAlreadyProcessed){
       const structuredPayload = {
         variantId: body.payload?.payment?.entity?.notes?.variantId || null,
