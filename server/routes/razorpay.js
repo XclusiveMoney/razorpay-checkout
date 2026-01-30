@@ -37,6 +37,9 @@ razorpayRoutes.post("/", async (req, res) => {
         ? await sendPurchaseCommunication(structuredPayload.customer.phone)
         : "";
     }
+    res.status(200).json({
+      ok: true
+    })
   } catch (err) {
     console.log("Failed to handle razorpya route reason -->" + err.message);
     res.status(400).json({
