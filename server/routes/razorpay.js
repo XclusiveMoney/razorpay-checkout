@@ -8,6 +8,10 @@ razorpayRoutes.post("/", async (req, res) => {
   try {
     const body = req.body;
     const shop = process.env.STORE_HANDLE;
+    console.log({
+      message: "webhook was triggered",
+      data: body,
+    });
     if (body?.event == "invoice.paid") {
       const structuredPayload = {
         variantId: body.payload?.payment?.entity?.notes?.variantId || null,
