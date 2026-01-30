@@ -21,7 +21,7 @@ const sendPurchaseCommunication = async (phone) => {
         callbackData: "some text here",
         type: "Template",
         template: {
-          name: "finalpp",
+          name: "postpurchase",
           languageCode: "en",
           bodyValues: [],
         },
@@ -29,6 +29,7 @@ const sendPurchaseCommunication = async (phone) => {
     });
 
     const res = await request.json();
+    console.log(res);
     return res;
   } catch (err) {
     throw new Error(

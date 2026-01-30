@@ -8,14 +8,12 @@ import { createShopifyOrder, getVariantInfo } from "./shopify.js";
 const handleRazorpayCheckout = async (shop, variantId) => {
   try {
     const variantData = await getVariantInfo(shop, variantId);
-    if(interval > 0){
-      const plan = await createRazorPayPlan({ ...variantData, variantId });
-      const subscription = await createRazorPaySubscription(plan);
-      return {
-        ...subscription,
-        amount: variantData.amount,
-      };
-    }
+    const plan = await createRazorPayPlan({ ...variantData, variantId });
+    const subscription = await createRazorPaySubscription(plan);
+    return {
+      ...subscription,
+      amount: variantData.amount,
+    };
   } catch (err) {
     console.log(err);
     throw new Error(

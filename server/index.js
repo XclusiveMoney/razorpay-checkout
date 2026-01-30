@@ -25,6 +25,7 @@ import checkoutRoutes from "./routes/checkout/index.js";
 import userRoutes from "./routes/index.js";
 import webhookHandler from "./webhooks/_index.js";
 import razorpayRoutes from "./routes/razorpay.js";
+import { sendPurchaseCommunication } from "./controllers/intrakat.js";
 
 setupCheck(); // Run a check to ensure everything is setup properly
 
@@ -49,7 +50,6 @@ const createServer = async (root = process.cwd()) => {
   );
 
   app.use(Express.json());
-
   app.post("/api/graphql", verifyRequest, async (req, res) => {
     try {
       const sessionId = await shopify.session.getCurrentId({

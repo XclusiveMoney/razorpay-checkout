@@ -95,6 +95,7 @@ const checkIfCustomerExist = async (shop, phoneNumber) => {
 const createShopifyOrder = async (shop, variantData, customerDetails) => {
   try {
     const customer = await checkIfCustomerExist(shop, customerDetails.phone);
+    console.log(customer);
     const { client } = await clientProvider.offline.graphqlClient({ shop });
     const query = `mutation orderCreate($order: OrderCreateOrderInput!){
       orderCreate(order: $order){
@@ -150,7 +151,8 @@ const createShopifyOrder = async (shop, variantData, customerDetails) => {
           phone: customerDetails.phone,
         },
       };
-    }
+    };
+    console.log(variables)
     const { data, errors, extensions } = await client.request(query, {
       variables,
     });
@@ -160,6 +162,7 @@ const createShopifyOrder = async (shop, variantData, customerDetails) => {
     if (data.orderCreate.userErrors.length > 0) {
       throw new Error("Failed to create order");
     }
+    console.log(data);
     return data.orderCreate.order;
   } catch (err) {
     console.log(err);
