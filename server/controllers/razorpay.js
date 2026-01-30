@@ -8,16 +8,16 @@ import { createShopifyOrder, getVariantInfo } from "./shopify.js";
 const handleRazorpayCheckout = async (shop, variantId) => {
   try {
     const variantData = await getVariantInfo(shop, variantId);
-    const shopifyOrder = await createShopifyOrder(shop, variantData);
-    const plan = await createRazorPayPlan(variantData);
-    const subscription = await createRazorPaySubscription(plan);
-    return {
-      ...subscription,
-      amount: variantData.amount,
-      order: shopifyOrder
-    };
+    if(interval > 0){
+      const plan = await createRazorPayPlan({ ...variantData, variantId });
+      const subscription = await createRazorPaySubscription(plan);
+      return {
+        ...subscription,
+        amount: variantData.amount,
+      };
+    }
   } catch (err) {
-    console.log(err)
+    console.log(err);
     throw new Error(
       "Failed to handle razorpay checkout reason -->" + err.message
     );
@@ -32,7 +32,13 @@ const handleRazorpayCheckout = async (shop, variantId) => {
  * @param {number} interval - Number of times customer should be charged
  * @param {number} price - amount to be charged
  */
-const createRazorPayPlan = async ({ title, period, interval, price }) => {
+const createRazorPayPlan = async ({
+  title,
+  variantId,
+  period,
+  interval,
+  price,
+}) => {
   try {
     const instance = new Razorpay({
       key_id: process.env.RAZORPAY_KEY_ID,
@@ -48,10 +54,12 @@ const createRazorPayPlan = async ({ title, period, interval, price }) => {
         currency: "INR",
         description: "",
       },
+      notes: {
+        variantId: variantId,
+      },
     });
     return plan;
   } catch (err) {
-    console.log("failed here first ---======---->><<<<", err);
     throw new Error("Failed to create razorpay plan reason -->" + err.message);
   }
 };
@@ -68,7 +76,7 @@ const createRazorPaySubscription = async (plan) => {
       quantity: 1,
       total_count: 1,
       addons: [],
-      notes: {},
+      notes: { ...plan.notes },
     });
     return subscription;
   } catch (err) {

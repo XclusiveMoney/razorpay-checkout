@@ -24,6 +24,7 @@ import proxyRouter from "./routes/app_proxy/index.js";
 import checkoutRoutes from "./routes/checkout/index.js";
 import userRoutes from "./routes/index.js";
 import webhookHandler from "./webhooks/_index.js";
+import razorpayRoutes from "./routes/razorpay.js";
 
 setupCheck(); // Run a check to ensure everything is setup properly
 
@@ -85,6 +86,7 @@ const createServer = async (root = process.cwd()) => {
     checkoutRoutes
   );
 
+  app.use("/api/razorpay", razorpayRoutes);
   app.post("/api/gdpr/:topic", verifyHmac, async (req, res) => {
     const { body } = req;
     const { topic } = req.params;
@@ -159,7 +161,6 @@ const createServer = async (root = process.cwd()) => {
         .send(fs.readFileSync(`${root}/dist/client/index.html`));
     });
   }
-
   return { app };
 };
 

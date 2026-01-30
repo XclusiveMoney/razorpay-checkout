@@ -17,9 +17,9 @@ jobs:
           DOCKER_PASS: ${{secrets.DOCKER_PASS}}
         run: docker login -u $DOCKERHUB_USERNAME -p $DOCKER_PASS
       - name: Pull Docker Image
-        run: sudo docker pull anitbishwas/swiss-event-handler:latest
+        run: sudo docker pull xclusivemoney/razorpay-checkout:latest
       - name: Delete Old Docker Container
-        run: sudo docker rm -f swiss-event-handler || true
+        run: sudo docker rm -f razorpay-checkout || true
       - name: Run Docker Container
         run: |
-          sudo docker run --env-file ~/secrets/.env -d -p 8080:8080 --restart=always --name swiss-event-handler anitbishwas/swiss-event-handler
+          sudo docker run --env-file ~/secrets/.env -d -p 8080:8080 --restart=always --name razorpay-checkout xclusivemoney/razorpay-checkout

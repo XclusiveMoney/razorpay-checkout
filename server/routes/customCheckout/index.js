@@ -1,31 +1,34 @@
 import { Router } from "express";
-import { handleRazorpayCheckout, handleRzorpaySuccess } from "../../controllers/razorpay.js";
+import {
+  handleRazorpayCheckout,
+  handleRzorpaySuccess,
+} from "../../controllers/razorpay.js";
 
 const customCheckoutRoutes = Router();
 
-
-customCheckoutRoutes.post("/success",async(req,res) =>{
-  try{
-     const payload = req.body;
+customCheckoutRoutes.post("/success", async (req, res) => {
+  try {
+    const payload = req.body;
     const shop = res.locals.user_shop;
     if (!payload?.variantId) {
       throw new Error("Required parameters missing");
-    };
-    const order = await handleRzorpaySuccess(shop,payload.variantId);
+    }
+    const order = await handleRzorpaySuccess(shop, payload.variantId);
     res.status(200).json({
       ok: true,
-      ...order
+      ...order,
     });
-  }catch(err){
+  } catch (err) {
     res.status(400).json({
-      ok: false
-    })
+      ok: false,
+    });
   }
-})
+});
 customCheckoutRoutes.post("/", async (req, res) => {
   try {
     const payload = req.body;
     const shop = res.locals.user_shop;
+
     if (!payload?.variantId) {
       throw new Error("Required parameters missing");
     }

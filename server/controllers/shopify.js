@@ -53,8 +53,48 @@ const getVariantInfo = async (shop, variantId) => {
   }
 };
 
-const createShopifyOrder = async (shop, variantData) => {
+/**
+ *
+ * @param {string} shop - shopify store handle
+ * @param {string} phoneNumber - customer phone number
+ * @returns
+ */
+const checkIfCustomerExist = async (shop, phoneNumber) => {
   try {
+    const { client } = await clientProvider.offline.graphqlClient({ shop });
+    const query = `query($identifier : CustomerIdentifierInput!){
+      customer: customerByIdentifier(identifier: $identifier){
+        id
+      }
+    }`;
+    const variables = {
+      identifier: {
+        phoneNumber: phoneNumber,
+      },
+    };
+    const { data, extensions, errors } = await client.request(query, {
+      variables,
+    });
+    if (errors && errors.length >= 1) {
+      throw new Error("Failed to check existing customer");
+    }
+    return data.customer;
+  } catch (err) {
+    throw new Error(
+      "Failed to check existing customer reason -->" + err.message
+    );
+  }
+};
+/**
+ *
+ * @param {string} shop - shopify store handle
+ * @param {object} variantData - variant object
+ * @param {object} customerDetails - customer details [email,phone]
+ * @returns
+ */
+const createShopifyOrder = async (shop, variantData, customerDetails) => {
+  try {
+    const customer = await checkIfCustomerExist(shop, customerDetails.phone);
     const { client } = await clientProvider.offline.graphqlClient({ shop });
     const query = `mutation orderCreate($order: OrderCreateOrderInput!){
       orderCreate(order: $order){
@@ -76,7 +116,7 @@ const createShopifyOrder = async (shop, variantData) => {
             title: variantData.displayName,
             priceSet: {
               shopMoney: {
-                amount: variantData.price/100,
+                amount: variantData.price / 100,
                 currencyCode: "INR",
               },
             },
@@ -86,10 +126,10 @@ const createShopifyOrder = async (shop, variantData) => {
         transactions: [
           {
             kind: "SALE",
-            status: "PENDING",
+            status: "SUCCESS",
             amountSet: {
               shopMoney: {
-                amount: variantData.price/100,
+                amount: variantData.price / 100,
                 currencyCode: "INR",
               },
             },
@@ -97,17 +137,33 @@ const createShopifyOrder = async (shop, variantData) => {
         ],
       },
     };
-    const {data,errors,extensions} = await client.request(query,{variables});
-    if(errors?.length >= 0){
+    if (customer) {
+      variables.order["customer"] = {
+        toAssociate: {
+          id: customer.id,
+        },
+      };
+    } else {
+      variables.order["customer"] = {
+        toUpsert: {
+          email: customerDetails.email,
+          phone: customerDetails.phone,
+        },
+      };
+    }
+    const { data, errors, extensions } = await client.request(query, {
+      variables,
+    });
+    if (errors?.length >= 0) {
       throw new Error("Failed to create order reason -->" + errors[0]);
-    };
-    if(data.orderCreate.userErrors.length > 0){
-      throw new Error("Failed to create order")
+    }
+    if (data.orderCreate.userErrors.length > 0) {
+      throw new Error("Failed to create order");
     }
     return data.orderCreate.order;
   } catch (err) {
-    console.log(err)
+    console.log(err);
     throw new Error("Failed to create shopify order reason -->" + err.message);
   }
 };
-export { getVariantInfo,createShopifyOrder };
+export { getVariantInfo, createShopifyOrder };
