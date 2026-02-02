@@ -26,6 +26,7 @@ import userRoutes from "./routes/index.js";
 import webhookHandler from "./webhooks/_index.js";
 import razorpayRoutes from "./routes/razorpay.js";
 import { sendPurchaseCommunication } from "./controllers/intrakat.js";
+import interaktRoutes from "./routes/interakt.js";
 
 setupCheck(); // Run a check to ensure everything is setup properly
 
@@ -42,7 +43,7 @@ const createServer = async (root = process.cwd()) => {
   const app = Express();
   app.disable("x-powered-by");
 
-  app.use("/health",(req,res) => res.status(200).json({ok: true}))
+  app.use("/health", (req, res) => res.status(200).json({ ok: true }));
   // Incoming webhook requests
   app.post(
     "/api/webhooks/*webhookTopic",
@@ -88,6 +89,8 @@ const createServer = async (root = process.cwd()) => {
   );
 
   app.use("/api/razorpay", razorpayRoutes);
+  app.use("/interakt", interaktRoutes);
+
   app.post("/api/gdpr/:topic", verifyHmac, async (req, res) => {
     const { body } = req;
     const { topic } = req.params;

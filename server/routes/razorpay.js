@@ -8,14 +8,17 @@ const razorpayRoutes = Router();
 razorpayRoutes.post("/", async (req, res) => {
   try {
     const body = req.body;
+    console.dir(body, { depth: null });
     const shop = process.env.STORE_HANDLE;
-    const isInvoiceAlreadyProcessed = await InvoiceModel.findOne({id: body.payload?.payment?.entity?.id });
+    const isInvoiceAlreadyProcessed = await InvoiceModel.findOne({
+      id: body.payload?.payment?.entity?.id,
+    });
     const invoice = new InvoiceModel({
-      id: body.payload?.payment?.entity?.id 
+      id: body.payload?.payment?.entity?.id,
     });
     await invoice.save();
     console.log("look if it existed or not --->", isInvoiceAlreadyProcessed);
-    if (body?.event == "invoice.paid" && !isInvoiceAlreadyProcessed){
+    if (body?.event == "invoice.paid" && !isInvoiceAlreadyProcessed) {
       const structuredPayload = {
         variantId: body.payload?.payment?.entity?.notes?.variantId || null,
         customer: {
@@ -37,9 +40,14 @@ razorpayRoutes.post("/", async (req, res) => {
         ? await sendPurchaseCommunication(structuredPayload.customer.phone)
         : "";
     }
+    if (body?.event == "order.paid") {
+      body?.payload?.payment?.entity?.contact
+        ? await sendPurchaseCommunication(body.payload.payment.entity.contact)
+        : null;
+    }
     res.status(200).json({
-      ok: true
-    })
+      ok: true,
+    });
   } catch (err) {
     console.log("Failed to handle razorpya route reason -->" + err.message);
     res.status(400).json({
