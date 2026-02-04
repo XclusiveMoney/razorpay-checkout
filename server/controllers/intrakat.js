@@ -21,7 +21,7 @@ const sendPurchaseCommunication = async (phone) => {
         callbackData: "some text here",
         type: "Template",
         template: {
-          name: "postpurchase",
+          name: "order_confirmation_for_automation",
           languageCode: "en",
           bodyValues: [],
         },
