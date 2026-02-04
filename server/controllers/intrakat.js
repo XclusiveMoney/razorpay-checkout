@@ -24,6 +24,7 @@ const sendPurchaseCommunication = async (phone) => {
           name: "order_confirmation_for_automation",
           languageCode: "en",
           bodyValues: [],
+          headerValues:["https://interaktprodmediastorage.blob.core.windows.net/mediaprodstoragecontainer/6d505269-e105-47ab-a1ce-9842d325d4cb/message_template_media/GPusSy530P6Y/ChatGPT%20Image%20Feb%203%2C%202026%2C%2002_06_15%20PM.png?se=2031-01-28T08%3A36%3A27Z&sp=rt&sv=2019-12-12&sr=b&sig=GysNjt1r4qNl/ktluHW/8rO9RPFwxIH5AMXfF/HIT6U%3D"]
         },
       }),
     });

@@ -177,3 +177,4 @@ if (isDev) {
     });
   });
 }
+sendPurchaseCommunication("7065257166")
