@@ -51,14 +51,15 @@ razorpayRoutes.post("/", async (req, res) => {
       body?.payload?.payment?.entity?.contact
         ? await sendPurchaseCommunication(body.payload.payment.entity.contact)
         : null;
-
-      const paymentId = body.payload.payment.entity.notes.shopify_order_id;
-      const phoneNumber = body.payload.payment.entity.contact;
-      const email = body.payload.payment.entity.email;
-      if (!paymentId || !phoneNumber || !email) {
-        console.log("Required parameters missing");
-      }
-      await sendEventToInterakt(paymentId, phoneNumber, email);
+      setTimeout(async () => {
+        const paymentId = body.payload.payment.entity.notes.shopify_order_id;
+        const phoneNumber = body.payload.payment.entity.contact;
+        const email = body.payload.payment.entity.email;
+        if (!paymentId || !phoneNumber || !email) {
+          console.log("Required parameters missing");
+        }
+        await sendEventToInterakt(paymentId, phoneNumber, email);
+      }, 1000);
     }
     res.status(200).json({
       ok: true,
