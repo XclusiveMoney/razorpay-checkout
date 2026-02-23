@@ -59,7 +59,7 @@ razorpayRoutes.post("/", async (req, res) => {
           console.log("Required parameters missing");
         }
         await sendEventToInterakt(paymentId, phoneNumber, email);
-      }, 1000);
+      }, 8000);
     }
     res.status(200).json({
       ok: true,
