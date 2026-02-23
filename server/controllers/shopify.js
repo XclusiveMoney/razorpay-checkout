@@ -215,9 +215,10 @@ const getShopifyOrderDetails = async (shop, paymentId) => {
       console.log("Failed", errors);
       throw new Error("Failed to get order details");
     }
-    if(data.orders.edges.length  == 0){
+    console.log("getting order details for", paymentId, data);
+    if (data.orders.edges.length == 0) {
       throw new Error("No order found");
-    };
+    }
     return data.orders.edges[0].node;
   } catch (err) {
     throw new Error(
@@ -225,4 +226,4 @@ const getShopifyOrderDetails = async (shop, paymentId) => {
     );
   }
 };
-export { getVariantInfo, createShopifyOrder,getShopifyOrderDetails };
+export { getVariantInfo, createShopifyOrder, getShopifyOrderDetails };

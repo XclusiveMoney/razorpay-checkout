@@ -1,6 +1,13 @@
 import { Router } from "express";
-import { createShopifyOrder, getShopifyOrderDetails, getVariantInfo } from "../controllers/shopify.js";
-import { sendEventToInterakt, sendPurchaseCommunication } from "../controllers/intrakat.js";
+import {
+  createShopifyOrder,
+  getShopifyOrderDetails,
+  getVariantInfo,
+} from "../controllers/shopify.js";
+import {
+  sendEventToInterakt,
+  sendPurchaseCommunication,
+} from "../controllers/intrakat.js";
 import InvoiceModel from "../../utils/models/InvoiceModel.js";
 
 const razorpayRoutes = Router();
@@ -9,6 +16,7 @@ razorpayRoutes.post("/", async (req, res) => {
   try {
     const body = req.body;
     console.log("Razorpay webhook was triggered ✅");
+    console.dir(body, { depth: null });
     const shop = process.env.STORE_HANDLE;
     const isInvoiceAlreadyProcessed = await InvoiceModel.findOne({
       id: body.payload?.payment?.entity?.id,
@@ -17,7 +25,6 @@ razorpayRoutes.post("/", async (req, res) => {
       id: body.payload?.payment?.entity?.id,
     });
     await invoice.save();
-    console.log("look if it existed or not --->", isInvoiceAlreadyProcessed);
     if (body?.event == "invoice.paid" && !isInvoiceAlreadyProcessed) {
       const structuredPayload = {
         variantId: body.payload?.payment?.entity?.notes?.variantId || null,
@@ -44,15 +51,14 @@ razorpayRoutes.post("/", async (req, res) => {
       body?.payload?.payment?.entity?.contact
         ? await sendPurchaseCommunication(body.payload.payment.entity.contact)
         : null;
-      
+
       const paymentId = body.payload.payment.entity.notes.shopify_order_id;
       const phoneNumber = body.payload.payment.entity.contact;
       const email = body.payload.payment.entity.email;
-      if(!paymentId || !phoneNumber || !email){
+      if (!paymentId || !phoneNumber || !email) {
         console.log("Required parameters missing");
-      } 
-        // getShopifyOrderDetails(shop,);
-      await sendEventToInterakt(paymentId,phoneNumber,email);
+      }
+      await sendEventToInterakt(paymentId, phoneNumber, email);
     }
     res.status(200).json({
       ok: true,

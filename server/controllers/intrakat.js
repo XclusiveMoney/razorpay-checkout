@@ -42,11 +42,11 @@ const sendPurchaseCommunication = async (phone) => {
   }
 };
 
-const sendEventToInterakt = async (paymentId,phoneNumber,email) => {
-  try{
-    const shop = 'idpzuz-xs.myshopify.com';
+const sendEventToInterakt = async (paymentId, phoneNumber, email) => {
+  try {
+    const shop = "idpzuz-xs.myshopify.com";
 
-    const orderDetails = await getShopifyOrderDetails(shop,paymentId);
+    const orderDetails = await getShopifyOrderDetails(shop, paymentId);
     let variantData = orderDetails?.lineItems?.edges[0]?.node || {};
     const eventPayload = {
       event: "order placed v2",
@@ -55,15 +55,18 @@ const sendEventToInterakt = async (paymentId,phoneNumber,email) => {
       traits: {
         createdAt: orderDetails.createdAt,
         name: orderDetails.customer.displayName,
-        customerShopifyId : orderDetails.customer.id.replace("gid://shopify/Customer/",""),
+        customerShopifyId: orderDetails.customer.id.replace(
+          "gid://shopify/Customer/",
+          ""
+        ),
         discountCode: orderDetails.discountCode,
         discountValue: Number(orderDetails.totalDiscountsSet.shopMoney.amount),
         customerEmail: email,
         price: Number(variantData.variant.price),
         title: variantData.title,
-        variantId : variantData.id.replace("gid://shopify/LineItem/",""),
-        amountSpent: Number(orderDetails.totalPriceSet.shopMoney.amount)
-      }
+        variantId: variantData.id.replace("gid://shopify/LineItem/", ""),
+        amountSpent: Number(orderDetails.totalPriceSet.shopMoney.amount),
+      },
     };
     const url = `https://api.interakt.ai/v1/public/track/events/`;
     const request = await fetch(url, {
@@ -76,11 +79,9 @@ const sendEventToInterakt = async (paymentId,phoneNumber,email) => {
     });
 
     const res = await request.json();
-    console.dir(res,{depth: null})
-  }catch(err){
+    console.dir(res, { depth: null });
+  } catch (err) {
     console.log("Failed to send event to interakt reason -->" + err.message);
   }
-}
-export { sendPurchaseCommunication,sendEventToInterakt };
-
-
+};
+export { sendPurchaseCommunication, sendEventToInterakt };
