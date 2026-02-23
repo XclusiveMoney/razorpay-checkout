@@ -82,3 +82,5 @@ const sendEventToInterakt = async (paymentId,phoneNumber,email) => {
   }
 }
 export { sendPurchaseCommunication,sendEventToInterakt };
+
+
