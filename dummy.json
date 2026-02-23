@@ -1,0 +1,87 @@
+{
+  "account_id": "acc_R6sqhJxzWq0wW1",
+  "contains": ["payment", "order"],
+  "created_at": 1771849587,
+  "entity": "event",
+  "event": "order.paid",
+  "payload": {
+    "order": {
+      "entity": {
+        "amount": 222,
+        "amount_due": 0,
+        "amount_paid": 222,
+        "attempts": 1,
+        "created_at": 1771849559,
+        "currency": "INR",
+        "entity": "order",
+        "id": "order_SJaQKWmCURBYKq",
+        "notes": {
+          "cancelUrl": "https://xclusive.money/checkouts/cn/hWN97FsdlO6rqchXKT9Z8P2H/en-in/processing?_r=AQABhTZzFZagRDl7CwAf0htHD-U0-V1MtXbkimBM-T6T",
+          "domain": "idpzuz-xs.myshopify.com",
+          "domains_list": "https://xclusive.money,https://idpzuz-xs.myshopify.com,https://xclusivemoney.myshopify.com,https://www.xclusive.money",
+          "gid": "gid://shopify/PaymentSession/r9vNkOhWkoDmH6iLrFH53rly9",
+          "is_magic_x": false,
+          "mode": "live",
+          "shopify_order_id": "r9vNkOhWkoDmH6iLrFH53rly9",
+          "type": "offsite"
+        },
+        "offer_id": null,
+        "receipt": "r9vNkOhWkoDmH6iLrFH53rly9",
+        "status": "paid"
+      }
+    },
+    "payment": {
+      "entity": {
+        "acquirer_data": { "rrn": "605417785238" },
+        "amount": 222,
+        "amount_captured": null,
+        "amount_refunded": 0,
+        "amount_transferred": 0,
+        "bank": null,
+        "base_amount": 222,
+        "captured": true,
+        "card_id": null,
+        "contact": "+917065257166",
+        "created_at": 1771849569,
+        "currency": "INR",
+        "description": null,
+        "email": "bishwasanit3@gmail.com",
+        "entity": "payment",
+        "error_code": null,
+        "error_description": null,
+        "error_reason": null,
+        "error_source": null,
+        "error_step": null,
+        "fee": 5,
+        "id": "pay_SJaQVnwwOjWgyr",
+        "international": false,
+        "invoice_id": null,
+        "method": "upi",
+        "notes": {
+          "cancelUrl": "https://xclusive.money/checkouts/cn/hWN97FsdlO6rqchXKT9Z8P2H/en-in/processing?_r=AQABhTZzFZagRDl7CwAf0htHD-U0-V1MtXbkimBM-T6T",
+          "domain": "idpzuz-xs.myshopify.com",
+          "domains_list": "https://xclusive.money,https://idpzuz-xs.myshopify.com,https://xclusivemoney.myshopify.com,https://www.xclusive.money",
+          "gid": "gid://shopify/PaymentSession/r9vNkOhWkoDmH6iLrFH53rly9",
+          "is_magic_x": false,
+          "mode": "live",
+          "referer_url": "https://xclusive.money/",
+          "shopify_order_id": "r9vNkOhWkoDmH6iLrFH53rly9",
+          "type": "offsite"
+        },
+        "order_id": "order_SJaQKWmCURBYKq",
+        "provider": null,
+        "refund_status": null,
+        "reward": null,
+        "status": "captured",
+        "tax": 0,
+        "upi": {
+          "flow": "collect",
+          "payer_account_type": "bank_account",
+          "vpa": "7065257166@pthdfc"
+        },
+        "vpa": "7065257166@pthdfc",
+        "wallet": null
+      }
+    }
+  }
+}

@@ -177,4 +177,4 @@ if (isDev) {
     });
   });
 }
-sendPurchaseCommunication("7065257166")
+// sendPurchaseCommunication("7065257166");

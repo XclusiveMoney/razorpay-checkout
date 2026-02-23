@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { createShopifyOrder, getVariantInfo } from "../controllers/shopify.js";
-import { sendPurchaseCommunication } from "../controllers/intrakat.js";
+import { createShopifyOrder, getShopifyOrderDetails, getVariantInfo } from "../controllers/shopify.js";
+import { sendEventToInterakt, sendPurchaseCommunication } from "../controllers/intrakat.js";
 import InvoiceModel from "../../utils/models/InvoiceModel.js";
 
 const razorpayRoutes = Router();
@@ -8,7 +8,7 @@ const razorpayRoutes = Router();
 razorpayRoutes.post("/", async (req, res) => {
   try {
     const body = req.body;
-    console.log("Razorpay webhook was triggered ✅")
+    console.log("Razorpay webhook was triggered ✅");
     const shop = process.env.STORE_HANDLE;
     const isInvoiceAlreadyProcessed = await InvoiceModel.findOne({
       id: body.payload?.payment?.entity?.id,
@@ -44,6 +44,15 @@ razorpayRoutes.post("/", async (req, res) => {
       body?.payload?.payment?.entity?.contact
         ? await sendPurchaseCommunication(body.payload.payment.entity.contact)
         : null;
+      
+      const paymentId = body.payload.payment.entity.notes.shopify_order_id;
+      const phoneNumber = body.payload.payment.entity.contact;
+      const email = body.payload.payment.entity.email;
+      if(!paymentId || !phoneNumber || !email){
+        console.log("Required parameters missing");
+      } 
+        // getShopifyOrderDetails(shop,);
+      await sendEventToInterakt(paymentId,phoneNumber,email);
     }
     res.status(200).json({
       ok: true,

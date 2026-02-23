@@ -169,4 +169,60 @@ const createShopifyOrder = async (shop, variantData, customerDetails) => {
     throw new Error("Failed to create shopify order reason -->" + err.message);
   }
 };
-export { getVariantInfo, createShopifyOrder };
+
+const getShopifyOrderDetails = async (shop, paymentId) => {
+  try {
+    const { client } = await clientProvider.offline.graphqlClient({ shop });
+    const query = `query {
+      orders(first: 1, query: "payment_id:${paymentId}"){
+        edges{
+          node{
+            id
+            createdAt
+            customer{
+              id
+              displayName
+            }
+            discountCode
+            totalPriceSet{
+              shopMoney{
+                amount
+              }
+            }
+            lineItems(first: 10){
+              edges{
+                node{
+                  id
+                  title
+                  variant{
+                    price
+                    id
+                  }
+                }
+              }
+            }
+            totalDiscountsSet{
+              shopMoney{
+                amount
+              }
+            }
+          }
+        }
+      }
+    }`;
+    const { data, extensions, errors } = await client.request(query);
+    if (errors && errors.length > 0) {
+      console.log("Failed", errors);
+      throw new Error("Failed to get order details");
+    }
+    if(data.orders.edges.length  == 0){
+      throw new Error("No order found");
+    };
+    return data.orders.edges[0].node;
+  } catch (err) {
+    throw new Error(
+      "Failed to get shopify order details reason -->" + err.message
+    );
+  }
+};
+export { getVariantInfo, createShopifyOrder,getShopifyOrderDetails };
