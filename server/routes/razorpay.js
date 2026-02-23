@@ -8,7 +8,7 @@ const razorpayRoutes = Router();
 razorpayRoutes.post("/", async (req, res) => {
   try {
     const body = req.body;
-    console.dir(body, { depth: null });
+    console.log("Razorpay webhook was triggered ✅")
     const shop = process.env.STORE_HANDLE;
     const isInvoiceAlreadyProcessed = await InvoiceModel.findOne({
       id: body.payload?.payment?.entity?.id,
