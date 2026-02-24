@@ -64,7 +64,7 @@ const sendEventToInterakt = async (paymentId, phoneNumber, email) => {
         customerEmail: email,
         price: Number(variantData.variant.price),
         title: variantData.title,
-        variantId: variantData.id.replace("gid://shopify/LineItem/", ""),
+        variantId: variantData.variant.id.replace("gid://shopify/LineItem/", ""),
         amountSpent: Number(orderDetails.totalPriceSet.shopMoney.amount),
       },
     };
