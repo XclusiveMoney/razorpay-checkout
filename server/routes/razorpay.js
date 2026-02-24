@@ -48,9 +48,9 @@ razorpayRoutes.post("/", async (req, res) => {
         : "";
     }
     if (body?.event == "order.paid") {
-      body?.payload?.payment?.entity?.contact
-        ? await sendPurchaseCommunication(body.payload.payment.entity.contact)
-        : null;
+      // body?.payload?.payment?.entity?.contact
+      //   ? await sendPurchaseCommunication(body.payload.payment.entity.contact)
+      //   : null;
       setTimeout(async () => {
         const paymentId = body.payload.payment.entity.notes.shopify_order_id;
         const phoneNumber = body.payload.payment.entity.contact;
