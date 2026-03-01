@@ -37,7 +37,6 @@ const orderCreateMapping = async (shop, payload) => {
       phoneNumber: compiledCustomerInfo.phone,
       orderDetails: payload,
     });
-    adas;
     console.log("✅ Succesfully handled order creation webhook");
   } catch (err) {
     await sendMessageFailureToDynamoDb({
