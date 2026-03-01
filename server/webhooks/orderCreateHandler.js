@@ -8,8 +8,8 @@ const orderCreateHandler = async (
   apiVersion
 ) => {
   /** @type {webhookTopic} */
-  // const webhookBody = JSON.parse(webhookRequestBody);
-  await orderCreateMapping(shop, webhookRequestBody);
+  const webhookBody = JSON.parse(webhookRequestBody);
+  await orderCreateMapping(shop, webhookBody);
 };
 
 export default orderCreateHandler;
