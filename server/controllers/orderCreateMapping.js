@@ -13,6 +13,7 @@ import { getCustomerDataViaRazorpayPaymentId } from "./razorpay.js";
 import {
   getCustomerRelatedInfoFromShopify,
   getPaymentIdOfOrder,
+  updateCustomerPhoneOnShopify,
 } from "./shopify.js";
 
 const orderCreateMapping = async (shop, payload) => {
@@ -38,6 +39,16 @@ const orderCreateMapping = async (shop, payload) => {
       orderDetails: payload,
     });
     console.log("✅ Succesfully handled order creation webhook");
+    if (!payload.customer.phone) {
+      console.log(
+        `Phone number not registered so we are manually inserting one 📞`
+      );
+      await updateCustomerPhoneOnShopify(
+        shop,
+        payload.customer.id,
+        customerInfo.phone
+      );
+    }
   } catch (err) {
     await sendMessageFailureToDynamoDb({
       orderId: payload.order_number,

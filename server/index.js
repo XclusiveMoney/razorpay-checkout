@@ -54,7 +54,13 @@ const createServer = async (root = process.cwd()) => {
 
   app.use(Express.json());
   app.use("/test", async (req, res) => {
-    orderCreateHandler("", process.env.STORE_HANDLE, req.body, "", "");
+    orderCreateHandler(
+      "",
+      process.env.STORE_HANDLE,
+      JSON.stringify(req.body),
+      "",
+      ""
+    );
   });
   app.post("/api/graphql", verifyRequest, async (req, res) => {
     try {

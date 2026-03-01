@@ -325,10 +325,57 @@ const getCustomerRelatedInfoFromShopify = async (shop, customerId) => {
     );
   }
 };
+
+const updateCustomerPhoneOnShopify = async (shop, customerId, phone) => {
+  try {
+    if (!shop || !customerId || !phone) {
+      throw new Error("Required parameters missing");
+    }
+    const ownerId = (customerId + "").includes("gid")
+      ? customerId
+      : `gid://shopify/Customer/${customerId}`;
+    console.log(ownerId);
+    const query = `mutation UpdateCustomerPhone($input: CustomerInput!){
+        customerUpdate(input: $input){
+          customer{
+            id
+          }
+          userErrors {
+            message
+            field
+          }
+        }
+    }`;
+    const variables = {
+      input: {
+        id: ownerId,
+        phone: phone,
+      },
+    };
+    const { client } = await clientProvider.offline.graphqlClient({ shop });
+    const { data, errors, extensions } = await client.request(query, {
+      variables,
+    });
+    if (errors && errors.length > 0) {
+      throw new Error("Failed to register customer phone" + errors.join(" | "));
+    }
+    if (data.customerUpdate?.userErrors?.length > 0) {
+      throw new Error(
+        "Failed to update customer phone reason" +
+          data.customerUpdate?.userErrors.map((el) => el.message).join(" | ")
+      );
+    }
+  } catch (err) {
+    throw new Error(
+      "Failed to update customer phone on shopify reason -->" + err.message
+    );
+  }
+};
 export {
   getVariantInfo,
   createShopifyOrder,
   getShopifyOrderDetails,
   getPaymentIdOfOrder,
   getCustomerRelatedInfoFromShopify,
+  updateCustomerPhoneOnShopify,
 };
