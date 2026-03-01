@@ -1,4 +1,4 @@
-import { sendPurchaseCommunication } from "../controllers/intrakat.js";
+import orderCreateMapping from "../controllers/orderCreateMapping.js";
 
 const orderCreateHandler = async (
   topic,
@@ -8,8 +8,8 @@ const orderCreateHandler = async (
   apiVersion
 ) => {
   /** @type {webhookTopic} */
-  const webhookBody = JSON.parse(webhookRequestBody);
-  // sendPurchaseCommunication(webhookBody.phone);
+  // const webhookBody = JSON.parse(webhookRequestBody);
+  await orderCreateMapping(shop, webhookRequestBody);
 };
 
 export default orderCreateHandler;

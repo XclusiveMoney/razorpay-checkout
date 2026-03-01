@@ -27,6 +27,7 @@ import webhookHandler from "./webhooks/_index.js";
 import razorpayRoutes from "./routes/razorpay.js";
 import { sendPurchaseCommunication } from "./controllers/intrakat.js";
 import interaktRoutes from "./routes/interakt.js";
+import orderCreateHandler from "./webhooks/orderCreateHandler.js";
 
 setupCheck(); // Run a check to ensure everything is setup properly
 
@@ -52,6 +53,9 @@ const createServer = async (root = process.cwd()) => {
   );
 
   app.use(Express.json());
+  app.use("/test", async (req, res) => {
+    orderCreateHandler("", process.env.STORE_HANDLE, req.body, "", "");
+  });
   app.post("/api/graphql", verifyRequest, async (req, res) => {
     try {
       const sessionId = await shopify.session.getCurrentId({
@@ -159,6 +163,7 @@ const createServer = async (root = process.cwd()) => {
     app.use(compression());
     app.use(serveStatic(resolve("dist/client")));
     app.use("/*splat", (req, res, next) => {
+      console.log("here we got hit");
       res
         .status(200)
         .set("Content-Type", "text/html")
@@ -177,4 +182,3 @@ if (isDev) {
     });
   });
 }
-// sendPurchaseCommunication("7065257166");

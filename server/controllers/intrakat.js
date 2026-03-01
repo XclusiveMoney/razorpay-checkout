@@ -64,7 +64,10 @@ const sendEventToInterakt = async (paymentId, phoneNumber, email) => {
         customerEmail: email,
         price: Number(variantData.variant.price),
         title: variantData.title,
-        variantId: variantData.variant.id.replace("gid://shopify/ProductVariant/", ""),
+        variantId: variantData.variant.id.replace(
+          "gid://shopify/ProductVariant/",
+          ""
+        ),
         amountSpent: Number(orderDetails.totalPriceSet.shopMoney.amount),
       },
     };
@@ -84,4 +87,98 @@ const sendEventToInterakt = async (paymentId, phoneNumber, email) => {
     console.log("Failed to send event to interakt reason -->" + err.message);
   }
 };
-export { sendPurchaseCommunication, sendEventToInterakt };
+
+const registerCustomerInInterakt = async ({
+  firstName,
+  lastName,
+  phone,
+  email,
+  totalSpent,
+  totalOrders,
+  customerId,
+}) => {
+  try {
+    const payload = {
+      countryCode: "+91",
+      phoneNumber: phone.replace("+91", ""),
+      traits: {
+        name: `${firstName} ${lastName}`,
+        email: email,
+        first_name: firstName,
+        last_name: lastName,
+        total_spent: totalSpent,
+        totalSpends: totalSpent,
+        "Total Spent": totalSpent,
+        total_orders_count: totalOrders,
+        shopify_customer_id: customerId,
+      },
+    };
+    const url = `https://api.interakt.ai/v1/public/track/users/`;
+    const request = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Basic ${process.env.INTRAKAT_API}`,
+      },
+      body: JSON.stringify(payload),
+    });
+    const res = await request.json();
+    if (!res.result) {
+      throw new Error("Failed to register customer in interakt");
+    }
+    return res;
+  } catch (err) {
+    throw new Error(
+      "Failed to handle customer registeration in interakt reason -->" +
+        err.message
+    );
+  }
+};
+const sendOrderPlacedEventToInterakt = async ({
+  phoneNumber,
+  orderDetails,
+}) => {
+  try {
+    const eventPayload = {
+      event: "order placed v2",
+      phoneNumber: phoneNumber.replace("+91"),
+      countryCode: "+91",
+      traits: {
+        createdAt: orderDetails.created_at,
+        discountCode: orderDetails.discount_codes
+          .map((el) => el.code)
+          .join(" "),
+        discountValue: Number(orderDetails.discount_codes[0].amount),
+        price: Number(orderDetails.line_items[0].price),
+        title: orderDetails.line_items[0].variant_title,
+        variantId: orderDetails.line_items[0].variant_id,
+        amountSpent: Number(orderDetails.total_price),
+      },
+    };
+    const url = `https://api.interakt.ai/v1/public/track/events/`;
+    const request = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Basic ${process.env.INTRAKAT_API}`,
+      },
+      body: JSON.stringify(eventPayload),
+    });
+
+    const res = await request.json();
+    if (!res.result) {
+      throw new Error("Failed to send order placed event to interakt");
+    }
+    return res;
+  } catch (err) {
+    throw new Error(
+      "Failed to send order placed event to interakt reason -->" + err.message
+    );
+  }
+};
+export {
+  sendPurchaseCommunication,
+  sendEventToInterakt,
+  registerCustomerInInterakt,
+  sendOrderPlacedEventToInterakt,
+};

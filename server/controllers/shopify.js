@@ -226,4 +226,109 @@ const getShopifyOrderDetails = async (shop, paymentId) => {
     );
   }
 };
-export { getVariantInfo, createShopifyOrder, getShopifyOrderDetails };
+
+/**
+ *
+ * @param {string} shop - shopify store handle
+ * @param {string} orderId - shopify resource GID
+ */
+const getPaymentIdOfOrder = async (shop, orderId) => {
+  try {
+    if (!shop || !orderId) {
+      throw new Error("Required params missing");
+    }
+    const ownerId = (orderId + "").includes("gid")
+      ? orderId
+      : `gid://shopify/Order/${orderId}`;
+    const query = `query OrderPaymentId($ownerId: ID!){
+      order(id: $ownerId){
+        transactions(first: 10){
+          id
+          kind
+          status
+          paymentId
+          gateway
+        }
+      }
+    }`;
+    const variables = {
+      ownerId: ownerId,
+    };
+    const { client } = await clientProvider.offline.graphqlClient({ shop });
+    const { data, errors, extensions } = await client.request(query, {
+      variables,
+    });
+    if (errors && errors.length > 0) {
+      throw new Error(
+        "Failed to get payment id reason -->" + errors.join(" | ")
+      );
+    }
+    let paymentId =
+      (data.order?.transactions || []).find(
+        (el) => el.kind == "SALE" || el.status == "SUCCESS"
+      )?.paymentId || null;
+    if (!paymentId) {
+      throw new Error("No payment id found");
+    }
+    return paymentId;
+  } catch (err) {
+    throw new Error(
+      "Failed to get payment id of order reason -->" + err.message
+    );
+  }
+};
+
+/**
+ *
+ * @param {string} shop - shopify store handle
+ * @param {string} customerId - shopify customer id
+ */
+const getCustomerRelatedInfoFromShopify = async (shop, customerId) => {
+  try {
+    if (!shop || !customerId) {
+      throw new Error("required parameters missing");
+    }
+    const ownerId = (customerId + "").includes("gid")
+      ? customerId
+      : `gid://shopify/Customer/${customerId}`;
+    const query = `query GetCustomer($id : ID!){
+      customer(id: $id){
+        firstName
+        lastName
+        amountSpent{
+          amount
+        }
+        numberOfOrders
+      }
+    }`;
+    const { client } = await clientProvider.offline.graphqlClient({ shop });
+    const { data, extensions, errors } = await client.request(query, {
+      variables: {
+        id: ownerId,
+      },
+    });
+    if (errors && errors.length > 0) {
+      throw new Error(errors.join(" | "));
+    }
+    if (!data?.customer) {
+      throw new Error("No customer found");
+    }
+    return {
+      firstName: data.customer.firstName,
+      lastName: data.customer.lastName,
+      totalSpent: Number(data.customer.amountSpent.amount || 0),
+      totalOrders: Number(data.customer.numberOfOrders || 0),
+    };
+  } catch (err) {
+    throw new Error(
+      "Failed to get customer info from shopify reason -->" + err.message
+    );
+  }
+};
+export {
+  getVariantInfo,
+  createShopifyOrder,
+  getShopifyOrderDetails,
+  getPaymentIdOfOrder,
+  getCustomerRelatedInfoFromShopify,
+};

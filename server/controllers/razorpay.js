@@ -99,4 +99,40 @@ const handleRzorpaySuccess = async (shop, variantId) => {
     );
   }
 };
-export { handleRazorpayCheckout, handleRzorpaySuccess };
+
+const getCustomerDataViaRazorpayPaymentId = async (paymentId) => {
+  try {
+    var instance = new Razorpay({
+      key_id: process.env.RAZORPAY_KEY_ID,
+      key_secret: process.env.RAZORPAY_KEY_SECRET,
+    });
+    const razorpayOrders = await instance.orders.all({
+      receipt: paymentId,
+    });
+    if (razorpayOrders?.items?.length == 0) {
+      throw new Error("No razorpay order found with the recipet id");
+    }
+    const razorpayPayment = await instance.orders.fetchPayments(
+      razorpayOrders?.items[0].id
+    );
+    if (razorpayPayment?.items?.length == 0) {
+      throw new Error("Now razorpay payment found with the razorpay order id");
+    }
+    const customer = {
+      email: razorpayPayment?.items[0]?.email || "",
+      phone: razorpayPayment?.items[0]?.contact || "",
+    };
+    return customer;
+  } catch (err) {
+    console.log(err);
+    throw new Error(
+      "Failed to get customer data via razorpay payment id reason -->" +
+        err.message
+    );
+  }
+};
+export {
+  handleRazorpayCheckout,
+  handleRzorpaySuccess,
+  getCustomerDataViaRazorpayPaymentId,
+};
